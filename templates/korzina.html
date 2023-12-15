@@ -1,11 +1,38 @@
-{% if cart_items %}
-    <h1>Корзина</h1>
-    <ul>
-        {% for item in cart_items %}
-            <li>{{ item.name }} - Цена: {{ item.price }} - Количество: {{ item.quantity }}</li>
-        {% endfor %}
-    </ul>
-    <a href="/rgz/checkout">Оформить заказ</a>  <!-- Ссылка на страницу оформления заказа -->
-{% else %}
-    <p>Ваша корзина пуста.</p>
-{% endif %}
+<style>
+    h1{
+        text-align: center;
+    }
+    a{
+        background-color: #343e48;
+        box-shadow: 0 3px 8px rgba(0, 0, 0);
+        width: 300px;
+        text-align: center;
+        margin: 10px;
+        margin-left: 500px;
+    }
+    ul {
+        color: aliceblue;
+    }
+</style>
+{% extends 'base.html' %}
+
+{% block lab %}{% endblock %}
+
+{% block main %}
+    
+        <li>
+            <a href="/rgz">Главная страница</a>
+        </li>
+    
+    {% if cart_items %}
+        <h1>Корзина</h1>
+        <ul>
+            {% for item in cart_items %}
+                <li>{{ item.name }} - Цена: {{ item.price }} - Количество: {{ item.kolvo }}</li>
+            {% endfor %}
+        </ul>
+        <a href="/rgz/checkout">Оформить заказ</a>  <!-- Ссылка на страницу оформления заказа -->
+    {% else %}
+        <p>Ваша корзина пуста.</p>
+    {% endif %}
+{% endblock %}

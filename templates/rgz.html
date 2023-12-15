@@ -1,31 +1,38 @@
+<style>
+    .product {
+        width: 30%;
+        display: inline-block;
+        margin: 1%;
+        vertical-align: top;
+    }
+</style>
 {% extends 'base.html' %}
 
-{% block lab %} Каталог{% endblock %}
+{% block lab %} {% endblock %}
 
 {% block main %}
     
-    <ul class="ty">
-       
+    <ul >
         <li >
-            <a href="/rgz/log" class="menu">Логин</a>
+            <a href="/rgz/log" >Логин</a>
         </li>
         <li >
-            <a href="/rgz/register" class="menu">Регистрация</a>
+            <a href="/rgz/register">Регистрация</a>
         </li>
         
         <li>
-            <a href="/rgz/logout" class="menu">Logout</a>
+            <a href="/rgz/logout">Logout</a>
         </li>
         <li>
-            <a href="/rgz/korzina">Корзина</a>
+            <a href="/rgz/korzina">Корзина {{ kolvo }}</a>
         </li>
     </ul>
     
     {% for product in products %}
-    <div>
+    <div class="product">
         <h3>{{ product.name_ }}</h3>
         <p>{{ product.opisanie }}</p>
-        <p>Цена: {{ product.price }}</p>
+        <p>Цена: {{ product.price }} руб.</p>
         {% if username != "Anon" %}
             <form action="/rgz/add_to_cart" method="POST">
                 <input type="hidden" name="product_id" value="{{ product.id }}">

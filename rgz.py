@@ -111,44 +111,48 @@ def loginPage():
 @rgz.route('/rgz/logout')
 def logout():
     session.clear()  # Удаление всех полей из сессии
-
-    conn = dbConnect()
-    cur = conn.cursor()
-
-    cur.execute("DELETE FROM cart WHERE user_id = %s", (session["id"],))
-
-    conn.commit()
-    cur.close()
-    conn.close()
-
     return redirect('/rgz/log')
 
 @rgz.route('/rgz/add_to_cart', methods=["POST"])
 def add_to_cart():
     if not session.get("username"):
         abort(403)  
-    product_id = request.form.get("product_id")
-    kolvo = request.form.get("kolvo")
+    product_ids = request.form.getlist("product_id")  # Get a list of product IDs
+    kolvo = request.form.getlist("kolvo")     # Get a list of kolvo
 
-    if not product_id or not kolvo:
+    if not product_ids or not kolvo:
         abort(400)
-    return render_template("korzina.html",product_id=product_id,kolvo=kolvo)
 
+    # Add the products and kolvo to the cart
+    # cart_items = []
+    # for product_id, kolvo in zip(product_ids, kolvo):
+    #     cart_items.append({"product_id": product_id, "kolvo": kolvo})
+
+    # return render_template("korzina.html", cart_items=cart_items)
+    conn = dbConnect()
+    cur = conn.cursor(cursor_factory=extras.DictCursor)
+
+    cart_items = []
+    for product_id, kolvo in zip(product_ids, kolvo):
+        cur.execute("SELECT name_, price FROM product WHERE id = %s", (product_id,))
+        product = cur.fetchone()
+        if product:
+            cart_items.append({"name": product["name_"], "price": product["price"], "kolvo": kolvo})
+
+    conn.close()
+    cur.close()
+    session["cart_items"] = cart_items
+
+    return render_template("korzina.html", cart_items=cart_items)
 @rgz.route('/rgz/korzina')
 def cart():
     if not session.get("username"):
         return redirect('/rgz/login')  # Перенаправление на страницу входа
 
-    # Получите данные из корзины для текущего пользователя (например, из базы данных или сессии)
-    cart_items = request.form.get("product_id")
+    # cart_items = request.form.get("product_id")
+
+    # return render_template("korzina.html", cart_items=cart_items)
+    cart_items = session.get("cart_items", [])
 
     return render_template("korzina.html", cart_items=cart_items)
-# @rgz.route('/catalog')
-# def catalog():
-#     userID = session.get("id")
-
-#     conn = dbConnect() 
-#     cur = conn.cursor()
-
-#     cur.execute("SELECT id, password FROM users WHERE username = %s", (username,))
 
