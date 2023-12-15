@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block lab %} Каталог{% endblock %}
+
+{% block main %}
+    
+    <ul class="ty">
+       
+        <li >
+            <a href="/rgz/log" class="menu">Логин</a>
+        </li>
+        <li >
+            <a href="/rgz/register" class="menu">Регистрация</a>
+        </li>
+        
+        <li>
+            <a href="/rgz/logout" class="menu">Logout</a>
+        </li>
+        <li>
+            <a href="/rgz/korzina">Корзина</a>
+        </li>
+    </ul>
+    
+    {% for product in products %}
+    <div>
+        <h3>{{ product.name_ }}</h3>
+        <p>{{ product.opisanie }}</p>
+        <p>Цена: {{ product.price }}</p>
+        {% if username != "Anon" %}
+            <form action="/rgz/add_to_cart" method="POST">
+                <input type="hidden" name="product_id" value="{{ product.id }}">
+                <input type="number" name="kolvo" value="1" min="1">
+                <button type="submit">Добавить в корзину</button>
+            </form>
+        {% else %}
+            <p>Авторизуйтесь, чтобы добавить товар в корзину.</p>
+        {% endif %}
+    </div>
+    {% endfor %}
+    
+{% endblock %}

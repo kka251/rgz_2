@@ -1,0 +1,11 @@
+{% if cart_items %}
+    <h1>Корзина</h1>
+    <ul>
+        {% for item in cart_items %}
+            <li>{{ item.name }} - Цена: {{ item.price }} - Количество: {{ item.quantity }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/rgz/checkout">Оформить заказ</a>  <!-- Ссылка на страницу оформления заказа -->
+{% else %}
+    <p>Ваша корзина пуста.</p>
+{% endif %}

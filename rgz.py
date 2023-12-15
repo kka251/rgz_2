@@ -1,18 +1,16 @@
 from flask import Blueprint, request, render_template, redirect, url_for, abort, jsonify, session
 import psycopg2
 from werkzeug.security import check_password_hash, generate_password_hash
+from psycopg2 import extras
+
 
 rgz = Blueprint ("rgz", __name__)
-
-@rgz.route('/rgz/')
-def main():
-    return render_template('rgz/catalog.html')
 
 def dbConnect():
     conn = psycopg2.connect(
         host="127.0.0.1", 
         database="rgz_web",
-        user= "kristina_knowledge_base",
+        user="kristina_knowledge_base",
         password="123")
     
     return conn
@@ -21,13 +19,23 @@ def dbClose(cur,conn):
     cur.close()
     conn.close()
 
+
+
 @rgz.route("/rgz")
 def main():
+    conn = dbConnect()
+    cur = conn.cursor(cursor_factory=extras.DictCursor)
+    
+    # Получить все товары
+    cur.execute("SELECT * FROM product")
+    products = cur.fetchall()
+    
     username = session.get("username")
     if not username:
         visibleUser = "Anon"
-        return render_template('rgz.html', username=visibleUser)
-    return render_template('rgz.html', username=username)
+        return render_template('rgz.html', username=visibleUser, products=products)
+    return render_template('rgz.html', username=username, products=products)
+
 
 @rgz.route('/rgz/register', methods=["GET","POST"])
 def registerPage():
@@ -63,7 +71,7 @@ def registerPage():
 
     return redirect("/rgz/log")
 
-@rgz.route('/lab5/log', methods=["GET","POST"])
+@rgz.route('/rgz/log', methods=["GET","POST"])
 def loginPage():
     errors = []
 
@@ -95,17 +103,52 @@ def loginPage():
         session['id'] = userID
         session['username'] = username
         dbClose(cur,conn)
-        return redirect("/lab5")
+        return redirect("/rgz")
     else:
         errors = ["Неправильный логин или пароль"]
         return render_template("log.html", errors=errors)
     
-@rgz.route('/catalog')
-def catalog():
-    userID = session.get("id")
+@rgz.route('/rgz/logout')
+def logout():
+    session.clear()  # Удаление всех полей из сессии
 
-    conn = dbConnect() 
+    conn = dbConnect()
     cur = conn.cursor()
 
-    cur.execute("SELECT id, password FROM users WHERE username = %s", (username,))
+    cur.execute("DELETE FROM cart WHERE user_id = %s", (session["id"],))
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    return redirect('/rgz/log')
+
+@rgz.route('/rgz/add_to_cart', methods=["POST"])
+def add_to_cart():
+    if not session.get("username"):
+        abort(403)  
+    product_id = request.form.get("product_id")
+    kolvo = request.form.get("kolvo")
+
+    if not product_id or not kolvo:
+        abort(400)
+    return render_template("korzina.html",product_id=product_id,kolvo=kolvo)
+
+@rgz.route('/rgz/korzina')
+def cart():
+    if not session.get("username"):
+        return redirect('/rgz/login')  # Перенаправление на страницу входа
+
+    # Получите данные из корзины для текущего пользователя (например, из базы данных или сессии)
+    cart_items = request.form.get("product_id")
+
+    return render_template("korzina.html", cart_items=cart_items)
+# @rgz.route('/catalog')
+# def catalog():
+#     userID = session.get("id")
+
+#     conn = dbConnect() 
+#     cur = conn.cursor()
+
+#     cur.execute("SELECT id, password FROM users WHERE username = %s", (username,))
 
