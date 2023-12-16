@@ -20,7 +20,6 @@ def dbClose(cur,conn):
     conn.close()
 
 
-
 @rgz.route("/rgz")
 def main():
     conn = dbConnect()
@@ -113,46 +112,6 @@ def logout():
     session.clear()  
     return redirect('/rgz/log')
 
-# @rgz.route('/rgz/add_to_cart', methods=["POST"])
-# def add_to_cart():
-#     if not session.get("username"):
-#         abort(403)  
-#     product_ids = request.form.getlist("product_id")  
-#     kolvo = request.form.getlist("kolvo")     
-
-#     if not product_ids or not kolvo:
-#         abort(400)
-
-#     conn = dbConnect()
-#     cur = conn.cursor(cursor_factory=extras.DictCursor)
-
-#     cart_items = []
-#     for product_id, kolvo in zip(product_ids, kolvo):
-#         cur.execute("SELECT name_, price, kolvo FROM product WHERE id = %s", (product_id,))
-#         product = cur.fetchone()
-#         if product:
-#             available_kolvo = product["kolvo"]
-#             if available_kolvo >= int(kolvo):
-#                 cart_items.append({"name": product["name_"], "price": product["price"], "kolvo": kolvo})
-#             else:
-#                 cart_items.append({"name": product["name_"], "price": product["price"], "kolvo": available_kolvo})
-        
-
-#     conn.close()
-#     cur.close()
-#     session["cart_items"] = cart_items
-
-#     return render_template("korzina.html", cart_items=cart_items)
-
-# @rgz.route('/rgz/korzina')
-# def cart():
-#     if not session.get("username"):
-#         return redirect('/rgz/login')  # Перенаправление на страницу входа
-
-#     cart_items = session.get("cart_items", [])
-
-#     return render_template("korzina.html", cart_items=cart_items)
-
 @rgz.route('/rgz/add_to_cart', methods=["POST"])
 def add_to_cart():
     if not session.get("username"):
@@ -229,25 +188,6 @@ def remove_from_cart():
 
     return redirect("/rgz/korzina")
 
-# @rgz.route('/rgz/oplata', methods=["GET", "POST"])
-# def oplata():
-#     if not session.get("username"):
-#         return redirect('/rgz/log')  # Перенаправление на страницу входа
-
-#     if request.method == "POST":
-        
-
-#         # Очистка корзины после оплаты
-
-#         session.pop("cart_items", None)
-#         session.pop("cart_total", None)
-#         return redirect('/rgz/oplata')
-    
-#     # Вывести информацию о корзине и форму оплаты
-#     cart_items = session.get("cart_items", [])
-#     cart_total = session.get("cart_total", 0)
-
-#     return render_template("oplata.html", cart_items=cart_items, cart_total=cart_total)
 
 @rgz.route('/rgz/oplata', methods=["GET", "POST"])
 def oplata():

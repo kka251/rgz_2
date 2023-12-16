@@ -53,7 +53,7 @@
         <p>{{ product.opisanie }}</p>
         <p>Цена: {{ product.price }} руб.</p>
         {% if username != "Anon" %}
-            <form action="/rgz/add_to_cart" method="POST">
+        <form action="/rgz/add_to_cart" method="POST">
                 <input type="hidden" name="product_id" value="{{ product.id }}">
                 <input type="number" name="kolvo" value="1" min="1">
                 <p><button type="submit">Добавить в корзину</button></p>
