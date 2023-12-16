@@ -229,3 +229,53 @@ def remove_from_cart():
 
     return redirect("/rgz/korzina")
 
+# @rgz.route('/rgz/oplata', methods=["GET", "POST"])
+# def oplata():
+#     if not session.get("username"):
+#         return redirect('/rgz/log')  # Перенаправление на страницу входа
+
+#     if request.method == "POST":
+        
+
+#         # Очистка корзины после оплаты
+
+#         session.pop("cart_items", None)
+#         session.pop("cart_total", None)
+#         return redirect('/rgz/oplata')
+    
+#     # Вывести информацию о корзине и форму оплаты
+#     cart_items = session.get("cart_items", [])
+#     cart_total = session.get("cart_total", 0)
+
+#     return render_template("oplata.html", cart_items=cart_items, cart_total=cart_total)
+
+@rgz.route('/rgz/oplata', methods=["GET", "POST"])
+def oplata():
+    if not session.get("username"):
+        return redirect('/rgz/log')  # Перенаправление на страницу входа
+
+    if request.method == "POST":
+        # Получить данные карты из формы
+        card_num = request.form.get("card_num")
+        cvv = request.form.get("cvv")
+
+        # Проверить данные карты
+        if len(card_num) != 16:
+            print('Неверный номер карты. Пожалуйста, введите 16-значный номер карты.', 'error')
+            return redirect('/rgz/oplata')
+        
+        if len(cvv) != 3:
+            print('Неверный CVV. Пожалуйста, введите 3-значный CVV код.', 'error')
+            return redirect('/rgz/oplata')
+
+        # Очистка корзины после оплаты
+        session.pop("cart_items", None)
+        session.pop("cart_total", None)
+
+        return render_template('success.html')
+    
+    # Вывести информацию о корзине и форму оплаты
+    cart_items = session.get("cart_items", [])
+    cart_total = session.get("cart_total", 0)
+
+    return render_template("oplata.html", cart_items=cart_items, cart_total=cart_total)
