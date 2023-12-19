@@ -47,8 +47,9 @@ def registerPage():
     password = request.form.get("password")
 
     if not (username or password):
-        errors = ["Пожалуйста, заполните все поля"]
-        return render_template("register.html", errors=errors)
+        return render_template("register.html", errors="Пожалуйста, заполните все поля")
+    if len(password) < 5:
+        return render_template("register.html", errors="Пароль меньше 5-ти символов")
 
     hashPassword = generate_password_hash(password)
 
@@ -106,7 +107,28 @@ def loginPage():
     else:
         errors = ["Неправильный логин или пароль"]
         return render_template("log.html", errors=errors)
-    
+
+@rgz.route("/rgz/delete_user", methods=["POST"])
+def delete_user():
+    if not session.get("username"):
+        abort(403)
+
+    # Получение идентификатора пользователя, которого нужно удалить
+    user_id = session.get("id")
+
+    # Удаление пользователя из базы данных
+    conn = dbConnect()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM users WHERE id = %s", (user_id,))
+    conn.commit()
+    conn.close()
+    cur.close()
+
+    # Очистка сессии
+    session.clear()
+
+    return redirect("/rgz/log")
+   
 @rgz.route('/rgz/logout')
 def logout():
     session.clear()  
@@ -136,13 +158,12 @@ def add_to_cart():
         if product:
             available_kolvo = product["kolvo"]
             if available_kolvo >= int(kolvo):
-                item_price = product["price"] * int(kolvo)
-                cart_total += item_price
-                cart_items.append({"name": product["name_"], "price": item_price, "kolvo": kolvo})
+                cart_items.append({"name": product["name_"], "price": product["price"], "kolvo": kolvo})
+                cart_total += int(product["price"]) * int(kolvo)
+
             else:
-                item_price = product["price"] * available_kolvo
-                cart_total += item_price
-                cart_items.append({"name": product["name_"], "price": item_price, "kolvo": available_kolvo})
+                cart_items.append({"name": product["name_"], "price": product["price"], "kolvo": available_kolvo})
+                cart_total += int(product["price"]) * int(available_kolvo)
 
     conn.close()
     cur.close()
@@ -154,9 +175,6 @@ def add_to_cart():
 
 @rgz.route('/rgz/korzina')
 def cart():
-    if not session.get("username"):
-        return redirect('/rgz/login')  # Перенаправление на страницу входа
-
     cart_items = session.get("cart_items", [])
     cart_total = session.get("cart_total", 0)
 
@@ -177,15 +195,16 @@ def remove_from_cart():
     cart_total = session.get("cart_total", 0)
 
     updated_cart_items = []
-
     for item in cart_items:
-        if item["name"] == product_name and item["price"] == product_price and item["kolvo"] == product_kolvo:
-            updated_cart_total = item["price"]
-        else:
+        if item["name"] != product_name or item["price"] != product_price or item["kolvo"] != product_kolvo:
             updated_cart_items.append(item)
+            price = item["price"].replace(",", ".")  
+            cart_total += float(price) * int(item["kolvo"]) 
 
     session["cart_items"] = updated_cart_items
+    session["cart_total"] = cart_total 
 
+    
     return redirect("/rgz/korzina")
 
 
@@ -219,3 +238,4 @@ def oplata():
     cart_total = session.get("cart_total", 0)
 
     return render_template("oplata.html", cart_items=cart_items, cart_total=cart_total)
+

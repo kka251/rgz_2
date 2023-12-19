@@ -43,7 +43,7 @@
         </li>
     </ul>   
     <div>
-        <h2>Итоговая сумма: {{ cart_total }}</h2>
+        <h2>Итоговая сумма: {{ cart_total }} руб.</h2>
         <form action="/rgz/oplata" method="post">
             <label for="card_num">Номер карты:</label>
             <input type="text" id="card_num" name="card_num" required pattern="[0-9]{16}" title="Номер карты должен содержать 16 цифр">

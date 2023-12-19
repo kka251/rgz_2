@@ -46,18 +46,24 @@
             {{ username }}
         </li>
     </ul>
-    
+    {% if username %}
+        <form action="/rgz/delete_user" method="POST">
+        <button type="submit" class="delete-button">Удалить пользователя</button>
+        </form>
+    {% endif %}
+  
     {% for product in products %}
     <div class="product">
         <h3>{{ product.name_ }}</h3>
         <p>{{ product.opisanie }}</p>
         <p>Цена: {{ product.price }} руб.</p>
         {% if username != "Anon" %}
-        <form action="/rgz/add_to_cart" method="POST">
-                <input type="hidden" name="product_id" value="{{ product.id }}">
-                <input type="number" name="kolvo" value="1" min="1">
-                <p><button type="submit">Добавить в корзину</button></p>
+            <form action="/rgz/add_to_cart" method="POST">
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="number" name="kolvo" value="1" min="1">
+                    <p><button type="submit">Добавить в корзину</button></p>
             </form>
+            
         {% else %}
             <p>Авторизуйтесь, чтобы добавить товар в корзину.</p>
         {% endif %}

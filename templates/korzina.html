@@ -72,33 +72,33 @@
     </li>
 
     {% if cart_items %}
-    <table>
-        <thead>
-            <tr>
-                <th>Название</th>
-                <th>Стоимость</th>
-                <th>Количество</th>
-                <th>Удалить</th>
-            </tr>
-        </thead>
-            <tbody>
-                {% for item in cart_items %}
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.price }}</td>
-                    <td>{{ item.kolvo }}</td>
-                    <td>
-                        <form action="/rgz/remove_from_cart" method="post">
-                            <input type="hidden" name="product_name" value="{{ item.name }}">
-                            <input type="hidden" name="product_price" value="{{ item.price }}">
-                            <input type="hidden" name="product_kolvo" value="{{ item.kolvo }}">
-                            <button type="submit">❌</button>
-                        </form>
-                    </td>
+                    <th>Название</th>
+                    <th>Цена</th>
+                    <th>Количество</th>
+                    <th>Удалить</th>
                 </tr>
-            </table>
-                {% endfor %}
-            </tbody>
+            </thead>
+                <tbody>
+                    {% for item in cart_items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.price }} руб.</td>
+                        <td>{{ item.kolvo }}</td>
+                        <td>
+                            <form action="/rgz/remove_from_cart" method="post">
+                                <input type="hidden" name="product_name" value="{{ item.name }}">
+                                <input type="hidden" name="product_price" value="{{ item.price }}">
+                                <input type="hidden" name="product_kolvo" value="{{ item.kolvo }}">
+                                <button type="submit">❌</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+        </table>
             <div><a href="/rgz/oplata">Оформить заказ</a></div>
         
         {% else %}
