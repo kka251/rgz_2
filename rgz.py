@@ -148,8 +148,8 @@ def add_to_cart():
     conn = dbConnect()
     cur = conn.cursor(cursor_factory=extras.DictCursor)
 
-    cart_items = []
-    cart_total = 0  # Переменная для хранения общей суммы
+    cart_items = session.get("cart_items") or []
+    cart_total = session.get("cart_total") or 0  # Переменная для хранения общей суммы
 
     for product_id, kolvo in zip(product_ids, kolvo):
         cur.execute("SELECT name_, price, kolvo FROM product WHERE id = %s", (product_id,))
